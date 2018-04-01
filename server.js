@@ -25,9 +25,9 @@ const statsOptions = {
   chunks: false,
   chunkModules: false,
   chunksSort: '!size',
-  modulesSort: '!size',
   colors: true,
   exclude: /node_modules|webpack|webpack.entry.js|browser.js|index.js/,
+  modulesSort: '!size',
   version: false,
 }
 
@@ -59,9 +59,9 @@ module.exports = function hyperloopServer(entry, config = {}) {
   }
 
   if (env === 'production' || config.liveReload === false) {
-    compileHyperloopBundle(compiler)
+    compileHyperloopBundle(entry, compiler)
   } else {
-    compileHyperloopLiveReloadBundle(config, compiler, () => {
+    compileHyperloopLiveReloadBundle(entry, config, compiler, () => {
       RootComponent = require(entry)
     })
   }
@@ -225,7 +225,7 @@ function serveHyperloopBundle(fs, req, res, next) {
   })
 }
 
-function compileHyperloopLiveReloadBundle(config, compiler, listener) {
+function compileHyperloopLiveReloadBundle(entry, config, compiler, listener) {
   let init = false
 
   console.log(`${chalk.grey('hyperloop ∞')} building your app ...`)
@@ -249,7 +249,7 @@ function compileHyperloopLiveReloadBundle(config, compiler, listener) {
     if (!init) {
       init = true
       console.log('')
-      console.log(stats.toString(statsOptions))
+      console.log(stats.toString({ ...statsOptions, context: path.dirname(entry) }))
       console.log('')
       console.log(`${chalk.grey('hyperloop ∞')} ready and watching for changes 🚀`)
     } else {
@@ -263,7 +263,7 @@ function compileHyperloopLiveReloadBundle(config, compiler, listener) {
   })
 }
 
-function compileHyperloopBundle(compiler) {
+function compileHyperloopBundle(entry, compiler) {
   console.log(`${chalk.grey('hyperloop ∞')} building your app ...`)
 
   return new Promise((resolve, reject) => {
@@ -276,7 +276,7 @@ function compileHyperloopBundle(compiler) {
     compiler.run((error, stats) => {
       if (error) return reject(error)
       console.log('')
-      console.log(stats.toString(statsOptions))
+      console.log(stats.toString({ ...statsOptions, context: path.dirname(entry) }))
       console.log('')
       console.log(`${chalk.grey('hyperloop ∞')} is ready 🚀`)
       compiler.compiled = true
