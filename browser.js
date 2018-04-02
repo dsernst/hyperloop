@@ -55,6 +55,7 @@ module.exports = class HyperloopContext {
       redirect: this.redirect,
       query: qs.parse(window.location.search.slice(1)),
       setStatus: this.setStatus,
+      url: window.location.pathname + window.location.search,
       userAgent: window.navigator.userAgent || 'Unknown',
     }
   }
