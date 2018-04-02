@@ -78,9 +78,8 @@ module.exports = class Component {
         return Promise.all(component.render())
       })
     }
-
     // when adopting, return a thunk that receives the DOM node to adopt
-    if (context.adopting) {
+    else if (context.adopting) {
       const adoptableThunk = (node) => {
         component.node = node
         return component.render()
@@ -88,16 +87,19 @@ module.exports = class Component {
       adoptableThunk.adoptableThunk = true
       return adoptableThunk
     }
-
-    if (component.onrender) {
+    else if (component.onrender) {
       if (component.isBrowser) {
         console.group(`${component.constructor.name}.onrender`)
         console.debug('oldProps:', component.props)
         console.debug('newProps:', props)
         console.groupEnd()
       }
+
+      context.initializing = true
       component.onrender(props)
+      context.initializing = false
     }
+
     component.setProps(props)
 
     return component.render()
@@ -169,7 +171,7 @@ module.exports = class Component {
     for (let key in newState) {
       state[key] = newState[key]
     }
-    if (render !== false) this.context.root.render()
+    if (this.context.initializing === false && render !== false) this.context.root.render()
     return this
   }
 
