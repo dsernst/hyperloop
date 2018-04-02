@@ -120,9 +120,11 @@ module.exports = class Component {
     }
 
     // set new state if returned from event handler
-    return Promise.resolve(handler.call(this, event, formData)).then((newState) => {
-      if (newState) this.setState(newState)
-    })
+    if (handler) {
+      return Promise.resolve(handler.call(this, event, formData)).then((newState) => {
+        if (newState) this.setState(newState)
+      })
+    }
   }
 
   get html() {
