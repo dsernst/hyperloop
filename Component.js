@@ -89,6 +89,17 @@ module.exports = class Component {
       return adoptableThunk
     }
 
+    if (component.onrender) {
+      if (component.isBrowser) {
+        console.group(`${component.constructor.name}.onrender`)
+        console.debug('oldProps:', component.props)
+        console.debug('newProps:', props)
+        console.groupEnd()
+      }
+      component.onrender(props)
+    }
+    component.setProps(props)
+
     return component.render()
   }
 
