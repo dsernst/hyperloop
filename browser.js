@@ -9,6 +9,7 @@ module.exports = class HyperloopContext {
     this.adopting = false
     this.initializing = false
     this.redirect = this.redirect.bind(this)
+    this.rendering = false
     this.state = state
     this.storage = {
       get: (key) => {
@@ -67,30 +68,18 @@ module.exports = class HyperloopContext {
   initialize(RootComponent, container, adopt = false) {
     this.initializing = true
 
-    const root = this.root = new RootComponent({}, this)
-
-    // resolve all oninit() handlers before rendering
-    if (root.oninit) {
-      console.group(`${root.constructor.name}.oninit`)
-    }
-    return Promise.resolve(root.oninit && root.oninit()).then((newState) => {
-      if (newState) root.setState(newState, false)
-      console.debug('newState:', newState)
-      console.groupEnd()
-      return Promise.all(root.render())
-    })
-    .then(() => {
+    return RootComponent.for({}, { context: this }).then(() => {
       this.initializing = false
 
       if (adopt) {
         // create root component node fragment to adopt
-        root.node = { ownerDocument: document, childNodes: Array.prototype.slice.call(container.childNodes, 1, -1) }
+        this.root.node = { ownerDocument: document, childNodes: Array.prototype.slice.call(container.childNodes, 1, -1) }
 
         this.adopting = true
-        root.render()
+        this.render()
         this.adopting = false
       } else {
-        hyperhtml.bind(container)`${root.render()}`
+        hyperhtml.bind(container)`${this.render()}`
       }
     })
     .catch(error => {
@@ -112,6 +101,16 @@ module.exports = class HyperloopContext {
     } else {
       window.location.href = url
     }
+  }
+
+  render() {
+    let result
+    if (!this.rendering) {
+      this.rendering = true
+      result = this.root.render()
+      this.rendering = false
+    }
+    return result
   }
 
   setStatus(code) {}

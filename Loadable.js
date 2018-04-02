@@ -9,7 +9,7 @@ module.exports = class Loadable extends Component {
     }
 
     return loader.call(this).then((loaded) => {
-      this.setProps({ loaded }).hyperloop.root.render()
+      this.setProps({ loaded }).context.render()
     })
   }
   render() {

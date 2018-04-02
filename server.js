@@ -147,6 +147,7 @@ class HyperloopContext {
     this.body = req.body
     this.res = res
     this.redirected = false
+    this.rendering = false
     this.state = Object.assign({}, initialState)
 
     const store = {}
@@ -180,24 +181,9 @@ class HyperloopContext {
     // resolve all oninit() and onsubmit() handlers before rendering
     this.initializing = true
 
-    const root = this.root = new RootComponent({}, this)
-
-    // resolve all oninit() and onsubmit() handlers before rendering
-    return Promise.resolve(root.oninit && root.oninit()).then((newState) => {
-      if (newState) root.setState(newState, false)
-      const event = { type: 'submit', preventDefault: noop, stopPropogation: noop }
-      if (!this.location.query.action || this.location.query.action === root.constructor.name) {
-        return Promise.resolve(root.onsubmit && root.onsubmit(event, this.body)).then((newState) => {
-          if (newState) root.setState(newState, false)
-          return Promise.all(root.render())
-        })
-      } else {
-        return Promise.all(root.render())
-      }
-    })
-    .then(() => {
+    return RootComponent.for({}, { context: this }).then(() => {
       this.initializing = false
-      return hyperhtml.wire()`${root.render()}`
+      return hyperhtml.wire()`${this.render()}`
     })
     .catch(error => {
       if (~error.message.indexOf('updates[(i - 1)] is not a function')) {
@@ -218,6 +204,16 @@ class HyperloopContext {
         this.res.redirect(code, url)
       }
     }
+  }
+
+  render() {
+    let result
+    if (!this.rendering) {
+      this.rendering = true
+      result = this.root.render()
+      this.rendering = false
+    }
+    return result
   }
 
   setStatus(code) {

@@ -34,7 +34,7 @@ module.exports = class Component {
     }
   }
 
-  static for(parent, props, id) {
+  static for(parent, props = {}, id) {
     // optional id argument to differentiate multiple children of the same class
     if (typeof props === 'string') {
       id = props
@@ -42,9 +42,12 @@ module.exports = class Component {
     }
 
     // fetch the previous child component for this parent
-    const context = parent.context
+    const context = parent.context || props.context
     const info = components.get(parent) || cacheComponent(parent)
     const component = getComponent(this, context, props, info, id == null ? `${this.name}-default` : id)
+
+    // set root to first component to instantiate
+    if (!context.root) context.root = component
 
     // when initializing, return a promise of all oninit() and onsubmit() functions
     if (context.initializing) {
@@ -95,9 +98,7 @@ module.exports = class Component {
         console.groupEnd()
       }
 
-      context.initializing = true
       component.onrender(props)
-      context.initializing = false
     }
 
     component.setProps(props)
@@ -171,7 +172,7 @@ module.exports = class Component {
     for (let key in newState) {
       state[key] = newState[key]
     }
-    if (this.context.initializing === false && render !== false) this.context.root.render()
+    if (render !== false) this.context.render()
     return this
   }
 

@@ -71,10 +71,10 @@ module.exports = class Router extends Component {
     Promise.resolve(this.load()).then(() => {
       window.scrollTo(0, 0)
       this.props.onPageChange && this.props.onPageChange.call(this)
-      this.context.root.render()
       page_title = this.props.pageTitle ? this.props.pageTitle(this.state) : window.document.title
       document.title = page_title
       window.history.replaceState({ page_title }, page_title, url)
+      this.context.render()
     })
   }
   load() {
