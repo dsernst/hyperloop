@@ -26,6 +26,7 @@
     "compression": "^1.7.2",
     "cookie-parser": "^1.4.3",
     "express": "^4.16.2",
+    "form-urlencoded": "^2.0.4",
     "humanize-duration": "^3.12.1",
     "hyperhtml": "git://github.com/alexmingoia/hyperHTML.git#re-adopt",
     "memory-fs": "^0.4.1",

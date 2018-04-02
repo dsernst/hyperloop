@@ -60,8 +60,8 @@ module.exports = class HyperloopContext {
     }
   }
 
-  form(event) {
-    return parseForm.parse(event.currentTarget).body
+  form(form) {
+    return parseForm.parse(form).body
   }
 
   initialize(RootComponent, container, adopt = false) {

@@ -1,5 +1,6 @@
 const Component = require('./Component')
 const pathToRegexp = require('path-to-regexp')
+const urlencoded = require('form-urlencoded')
 
 /*
   {
@@ -16,6 +17,7 @@ module.exports = class Router extends Component {
     this.onredirect = this.onredirect.bind(this)
     this.onpopstate = this.onpopstate.bind(this)
     this.onclick = this.onclick.bind(this)
+    this.onsubmit = this.onsubmit.bind(this)
     return this.load()
   }
   onredirect(event) {
@@ -35,12 +37,27 @@ module.exports = class Router extends Component {
       this.navigateTo(href)
     }
   }
+  onsubmit(event) {
+    const form = event.target.tagName === 'FORM' && event.target
+    const isGET = form.getAttribute('method') === 'GET'
+    const action = form.getAttribute('action') || this.location.path
+
+    if (form && isGET) {
+      event.preventDefault()
+      const formData = this.context.form(form)
+      const formUrl = urlencoded(formData)
+      if (formUrl) {
+        this.navigateTo(`${action}?${formUrl}`)
+      }
+    }
+  }
   onconnected() {
     const page_title = this.props.pageTitle ? this.props.pageTitle(this.state) : window.document.title
     window.history.replaceState({ page_title }, page_title, document.location.pathname)
     window.addEventListener('popstate', this.onpopstate)
     window.addEventListener('redirect', this.onredirect)
     if (this.overrideAnchors !== false) window.addEventListener('click', this.onclick)
+    if (this.overrideAnchors !== false) window.addEventListener('submit', this.onsubmit)
   }
   ondisconnected() {
     window.removeEventListener('popstate', this.onpopstate)

@@ -116,11 +116,12 @@ module.exports = class Component {
     let formData = null
 
     if (event.type === 'submit') {
-      formData = this.context.form(event)
+      formData = this.context.form(event.currentTarget)
     }
 
     // set new state if returned from event handler
     if (handler) {
+      event.stopPropagation()
       return Promise.resolve(handler.call(this, event, formData)).then((newState) => {
         if (newState) this.setState(newState)
       })
