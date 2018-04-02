@@ -47,13 +47,13 @@ module.exports = class Router extends Component {
     if (this.overrideAnchors !== false) window.removeEventListener('click', this.onclick)
   }
   navigateTo(url) {
-    this.props.onPageChange && this.props.onPageChange.call(this)
     let page_title = this.props.pageTitle ? this.props.pageTitle(this.state) : window.document.title
     window.history.pushState({ page_title }, page_title, url)
     document.title = page_title
     this.setProps({ loaded: false }).render()
     Promise.resolve(this.load()).then(() => {
       window.scrollTo(0, 0)
+      this.props.onPageChange && this.props.onPageChange.call(this)
       this.context.root.render()
       page_title = this.props.pageTitle ? this.props.pageTitle(this.state) : window.document.title
       document.title = page_title
@@ -75,7 +75,7 @@ module.exports = class Router extends Component {
   }
   match() {
     const { routes } = this.props
-    const { path } = this.location
+    const { url, path } = this.location
 
     if (!this.props.stack) {
       this.setProps({
@@ -94,6 +94,7 @@ module.exports = class Router extends Component {
         let matches = route.regexp.exec(path)
         this.context._routerPath$ = route.path
         this.setProps({
+          url,
           path,
           params: matches.slice(1).reduce((b, a, i) => {
             b[route.keys[i]] = a
@@ -116,8 +117,8 @@ module.exports = class Router extends Component {
 
     return this.html`
       <div class="hyperloop_router" onconnected=${this}>${loaded
-        ? (loaded.default || loaded).for(this, `${path}-loadable-loaded`, this.props)
-        : (loading ? (loading.default || loading).for(this, `${path}-loadable-loading`, this.props) : '')
+        ? (loaded.default || loaded).for(this, this.props, `${path}-loadable-loaded`)
+        : (loading ? (loading.default || loading).for(this, this.props, `${path}-loadable-loading`) : '')
       }</div>
     `
   }
