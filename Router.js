@@ -53,7 +53,7 @@ module.exports = class Router extends Component {
   }
   onconnected() {
     const page_title = this.props.pageTitle ? this.props.pageTitle(this.state) : window.document.title
-    window.history.replaceState({ page_title }, page_title, document.location.pathname)
+    window.history.replaceState({ page_title }, page_title, `${window.location.pathname}${window.location.search}`)
     window.addEventListener('popstate', this.onpopstate)
     window.addEventListener('redirect', this.onredirect)
     if (this.overrideAnchors !== false) window.addEventListener('click', this.onclick)
