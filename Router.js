@@ -64,12 +64,13 @@ module.exports = class Router extends Component {
     if (this.overrideAnchors !== false) window.removeEventListener('click', this.onclick)
   }
   navigateTo(url) {
+    const prev_path = this.location.path
     let page_title = this.props.pageTitle ? this.props.pageTitle(this.state) : window.document.title
     window.history.pushState({ page_title }, page_title, url)
     document.title = page_title
     this.setProps({ loaded: false }).render()
     Promise.resolve(this.load()).then(() => {
-      window.scrollTo(0, 0)
+      if (prev_path !== this.location.path) window.scrollTo(0, 0)
       this.props.onPageChange && this.props.onPageChange.call(this)
       page_title = this.props.pageTitle ? this.props.pageTitle(this.state) : window.document.title
       document.title = page_title
