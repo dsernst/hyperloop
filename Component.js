@@ -172,7 +172,7 @@ module.exports = class Component {
     for (let key in newState) {
       state[key] = newState[key]
     }
-    if (render !== false) this.context.render()
+    if (!this.context.initializing && render !== false) this.context.render()
     return this
   }
 
