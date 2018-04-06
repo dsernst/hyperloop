@@ -34,7 +34,7 @@ module.exports = class Router extends Component {
     const anchor = node.tagName === 'A' ? node : (parent.tagName === 'A' && parent)
     const href = anchor && anchor.getAttribute('href')
 
-    if (href && href[0] === '/') {
+    if (href && href[0] === '/' && href !== this.location.url) {
       event.preventDefault()
       this.navigateTo(href)
     }
