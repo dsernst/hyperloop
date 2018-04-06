@@ -34,7 +34,7 @@ module.exports = class Component {
     }
   }
 
-  static for(parent, props = {}, id) {
+  static for(parent, props = {}, id, render) {
     // optional id argument to differentiate multiple children of the same class
     if (typeof props === 'string') {
       id = props
@@ -90,19 +90,10 @@ module.exports = class Component {
       adoptableThunk.adoptableThunk = true
       return adoptableThunk
     }
-    else if (component.onrender) {
-      if (component.isBrowser) {
-        console.group(`${component.constructor.name}.onrender`)
-        console.debug('oldProps:', component.props)
-        console.debug('newProps:', props)
-        console.groupEnd()
-      }
-
-      component.onrender(props)
-    }
 
     component.setProps(props)
 
+    if (render === false) return component
     return component.render()
   }
 

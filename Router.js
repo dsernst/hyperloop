@@ -29,8 +29,10 @@ module.exports = class Router extends Component {
     Promise.resolve(this.load()).then(() => this.render())
   }
   onclick(event) {
-    const a = event.target.tagName === 'A' && event.target
-    const href = a && a.getAttribute('href')
+    const node = event.target
+    const parent = node.parentNode
+    const anchor = node.tagName === 'A' ? node : (parent.tagName === 'A' && parent)
+    const href = anchor && anchor.getAttribute('href')
 
     if (href && href[0] === '/') {
       event.preventDefault()
@@ -56,25 +58,32 @@ module.exports = class Router extends Component {
     window.history.replaceState({ page_title }, page_title, `${window.location.pathname}${window.location.search}`)
     window.addEventListener('popstate', this.onpopstate)
     window.addEventListener('redirect', this.onredirect)
-    if (this.overrideAnchors !== false) window.addEventListener('click', this.onclick)
-    if (this.overrideAnchors !== false) window.addEventListener('submit', this.onsubmit)
+    if (this.overrideAnchors !== false) {
+      window.addEventListener('click', this.onclick)
+      window.addEventListener('submit', this.onsubmit)
+    }
   }
   ondisconnected() {
     window.removeEventListener('popstate', this.onpopstate)
-    if (this.overrideAnchors !== false) window.removeEventListener('click', this.onclick)
+    if (this.overrideAnchors !== false) {
+      window.removeEventListener('click', this.onclick)
+      window.removeEventListener('submit', this.onsubmit)
+    }
   }
   navigateTo(url) {
     const prev_path = this.location.path
     let page_title = this.props.pageTitle ? this.props.pageTitle(this.state) : window.document.title
+    this.setProps({ loaded: false }).render()
     window.history.pushState({ page_title }, page_title, url)
     document.title = page_title
-    this.setProps({ loaded: false }).render()
     Promise.resolve(this.load()).then(() => {
       if (prev_path !== this.location.path) window.scrollTo(0, 0)
       this.props.onPageChange && this.props.onPageChange.call(this)
       page_title = this.props.pageTitle ? this.props.pageTitle(this.state) : window.document.title
       document.title = page_title
       window.history.replaceState({ page_title }, page_title, url)
+      const component = this.props.loaded.for(this, this.props, `${this.location.path}-loadable-loaded`, false)
+      if (component.props.url && component.onpagechange) component.onpagechange()
       this.context.render()
     })
   }
@@ -85,10 +94,10 @@ module.exports = class Router extends Component {
       let loader = typeof matched === 'function' ? matched.call(this) : matched
       if (loader.then) {
         return loader.then((loaded) => {
-          this.setProps({ loaded })
+          this.setProps({ loaded: loaded.default || loaded })
         })
       }
-      this.setProps({ loaded: loader })
+      this.setProps({ loaded: loader.default || loader })
     }
   }
   match() {
@@ -115,7 +124,7 @@ module.exports = class Router extends Component {
           url,
           path,
           params: matches.slice(1).reduce((b, a, i) => {
-            b[route.keys[i]] = a
+            b[route.keys[i].name] = a
             return b
           }, {})
         })
@@ -135,8 +144,8 @@ module.exports = class Router extends Component {
 
     return this.html`
       <div class="hyperloop_router" onconnected=${this}>${loaded
-        ? (loaded.default || loaded).for(this, this.props, `${path}-loadable-loaded`)
-        : (loading ? (loading.default || loading).for(this, this.props, `${path}-loadable-loading`) : '')
+        ? loaded.for(this, this.props, `${path}-loadable-loaded`)
+        : (loading ? loading.for(this, this.props, `${path}-loadable-loading`) : '')
       }</div>
     `
   }
