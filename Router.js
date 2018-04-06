@@ -24,9 +24,7 @@ module.exports = class Router extends Component {
     this.navigateTo(event.detail.url)
   }
   onpopstate(event) {
-    this.render()
-    if (event.state.page_title) document.title = event.state.page_title
-    Promise.resolve(this.load()).then(() => this.render())
+    this.navigateTo(document.location.pathname + document.location.search, false)
   }
   onclick(event) {
     const node = event.target
@@ -70,11 +68,11 @@ module.exports = class Router extends Component {
       window.removeEventListener('submit', this.onsubmit)
     }
   }
-  navigateTo(url) {
+  navigateTo(url, pushState) {
     const prev_path = this.location.path
     let page_title = this.props.pageTitle ? this.props.pageTitle(this.state) : window.document.title
     this.setProps({ loaded: false }).render()
-    window.history.pushState({ page_title }, page_title, url)
+    if (pushState !== false) window.history.pushState({ page_title }, page_title, url)
     document.title = page_title
     Promise.resolve(this.load()).then(() => {
       if (prev_path !== this.location.path) window.scrollTo(0, 0)
