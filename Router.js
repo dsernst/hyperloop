@@ -74,14 +74,16 @@ module.exports = class Router extends Component {
     this.setProps({ loaded: false }).render()
     if (pushState !== false) window.history.pushState({ page_title }, page_title, url)
     document.title = page_title
+    this.props.beforePageChange && this.props.beforePageChange.call(this)
+    const oldProps = Object.assign({}, this.props)
     Promise.resolve(this.load()).then(() => {
       if (prev_path !== this.location.path) window.scrollTo(0, 0)
-      this.props.onPageChange && this.props.onPageChange.call(this)
+      this.props.afterPageChange && this.props.afterPageChange.call(this)
       page_title = this.props.pageTitle ? this.props.pageTitle(this.state) : window.document.title
       document.title = page_title
       window.history.replaceState({ page_title }, page_title, url)
       const component = this.props.loaded.for(this, this.props, `${this.location.path}-loadable-loaded`, false)
-      if (component.props.url && component.onpagechange) component.onpagechange()
+      if (component.props.url && component.onpagechange) component.onpagechange(oldProps)
       this.context.render()
     })
   }
