@@ -18,7 +18,7 @@ applications, using a React-like component API.
 ## Get started
 
 ```javascript
-const hyperloop = require('hyperloop')
+const hyperloop = require('@alexmingoia/hyperloop')
 const path = require('path')
 
 // specify absolute path to your root component
@@ -35,7 +35,7 @@ Components are any class that extends `Hyperloop.Component`.
 Like React, components must define a `render()` function:
 
 ```javascript
-const { Component } = require('hyperloop')
+const { Component } = require('@alexmingoia/hyperloop')
 
 class App extends Component {
   render() {
@@ -56,7 +56,7 @@ ensures that components receive the proper context and are reused for each
 render.
 
 ```javascript
-const { Component } = require('hyperloop')
+const { Component } = require('@alexmingoia/hyperloop')
 const UserAvatar = require('./UserAvatar')
 const UserInfo = require('./UserInfo')
 
@@ -154,7 +154,7 @@ request to the server.
 Use the higher-order `hyperloop.Router` component to achieve lazy-loaded isomorphic routing.
 
 ```javascript
-const { Component, Router } = require('hyperloop')
+const { Component, Router } = require('@alexmingoia/hyperloop')
 
 class App extends Component {
   render() {
@@ -258,7 +258,7 @@ The application state. Do not modify directly, use setState() instead.
 When using import() the module path must be static not dynamic, so that webpack can properly transpile import() calls.
 
 ```javascript
-const { Component, Router } = require('hyperloop')
+const { Component, Router } = require('@alexmingoia/hyperloop')
 
 class App extends Component {
   render() {
