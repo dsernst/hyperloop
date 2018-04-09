@@ -51,31 +51,12 @@ module.exports = class Component {
 
     // when initializing, return a promise of all oninit() and onsubmit() functions
     if (context.initializing) {
-      if (this.isBrowser && component.oninit) {
-        console.group(`${component.constructor.name}.oninit`)
-      }
-      return Promise.resolve(component.oninit && component.oninit()).then((newState) => {
-        if (newState) component.setState(newState, false)
-        if (this.isBrowser) {
-          console.debug('newState:', newState)
-          console.groupEnd()
-        }
+      return component.handleEvent({ type: 'init', preventDefault: noop, stopPropagation: noop }).then(() => {
         if (context.location.method === 'POST') {
-          const event = { type: 'submit', preventDefault: noop }
           if (!context.location.query.action || context.location.query.action === component.constructor.name) {
-            if (this.isBrowser && component.onsubmit) {
-              console.group(`${component.constructor.name}.onsubmit`)
-            }
-            return Promise.resolve(component.onsubmit && component.onsubmit(event, context.form())).then((newState) => {
-              if (newState) component.setState(newState, false)
-              if (this.isBrowser) {
-                console.debug('newState:', newState)
-                console.groupEnd()
-              }
+            return component.handleEvent({ type: 'submit', preventDefault: noop, stopPropagation: noop }).then(() => {
               return Promise.all(component.render())
             })
-          } else {
-            return Promise.all(component.render())
           }
         }
         return Promise.all(component.render())
@@ -103,7 +84,6 @@ module.exports = class Component {
     if (this.isBrowser) {
       console.group(`${this.constructor.name}.on${event.type}`)
       console.debug('event:', event)
-      console.groupEnd()
     }
 
     const handler = this[`on${event.type}`]
@@ -111,7 +91,10 @@ module.exports = class Component {
 
     if (event.type === 'submit') {
       formData = this.context.form(event.currentTarget)
+      if (this.isBrowser) console.debug('formData:', formData)
     }
+
+    if (this.isBrowser) console.groupEnd()
 
     // set new state if returned from event handler
     if (handler) {
@@ -120,6 +103,7 @@ module.exports = class Component {
         if (newState) this.setState(newState)
       })
     }
+    return Promise.resolve()
   }
 
   get html() {
