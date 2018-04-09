@@ -1,6 +1,7 @@
-# Hyperl∞p 🚄 ✌
+# Hyperl∞p 🚄
 
-![npm](https://img.shields.io/npm/v/hyperloop.svg)
+![npm](https://img.shields.io/npm/v/@alexmingoia/hyperloop.svg)
+![status](https://img.shields.io/badge/api-unstable-orange.svg)
 ![license](https://img.shields.io/github/license/alexmingoia/hyperloop.svg)
 
 Zero configuration library for building isomorphic progressively-enhanced web
@@ -12,7 +13,7 @@ applications, using a React-like component API.
 - **Truly isomorphic**: Apps work with or without JS. Choose to only render server-side or serve the whole app as JS, or get the best of both and lazy-load JS on demand!
 - **Built on web standards**: Uses ES6/2015, template literals, Fetch API, and good ol' web forms.
 - **Redux ready**: Easy integration with state management tools like Redux
-- **Tiny**: Library footprint of only 8.6K gzipped thanks to hyperHTML and domdiff!
+- **Tiny**: Only 16KB gzipped!
 
 ## Get started
 
@@ -248,8 +249,9 @@ The application state. Do not modify directly, use setState() instead.
 
 #### props
 
+- **afterPageChange**: called after page changes
+- **beforePageChange**: called before page changes
 - **notFound**: function that returns promisable component
-- **onPageChange**: function which receives current state and called whenever page changes
 - **pageTitle**: function which receives current state and returns page title
 - **routes**: map of URL patterns to functions that return promisable components
 
