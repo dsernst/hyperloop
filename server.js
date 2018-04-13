@@ -121,7 +121,7 @@ function serveHyperloopPage(config, webpackConfig, compiler, RootComponent, req,
               : ''}
           </head>
           <body>
-            <div id="hyperloop_application">${html}</div>
+            <div id="hyperloop_application"></div>
           </body>
         </html>
       `)
