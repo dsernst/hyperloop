@@ -96,7 +96,7 @@ module.exports = class HyperloopContext {
     if (!url) url = code
     if (url[0] === '/') {
       dispatchEvent(new CustomEvent('redirect', {
-        detail: { url },
+        detail: { url, code },
       }))
     } else {
       window.location.href = url

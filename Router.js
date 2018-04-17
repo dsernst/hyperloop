@@ -21,7 +21,11 @@ module.exports = class Router extends Component {
     return this.load()
   }
   onredirect(event) {
-    this.navigateTo(event.detail.url)
+    if (event.detail.code === 303) {
+      this.navigateTo(event.detail.url, true)
+    } else {
+      this.navigateTo(event.detail.url, false, true)
+    }
   }
   onpopstate(event) {
     this.navigateTo(document.location.pathname + document.location.search, false)
@@ -63,16 +67,18 @@ module.exports = class Router extends Component {
   }
   ondisconnected() {
     window.removeEventListener('popstate', this.onpopstate)
+    window.removeEventListener('redirect', this.onredirect)
     if (this.overrideAnchors !== false) {
       window.removeEventListener('click', this.onclick)
       window.removeEventListener('submit', this.onsubmit)
     }
   }
-  navigateTo(url, pushState) {
+  navigateTo(url, pushState, replaceState) {
     const prev_path = this.location.path
     let page_title = this.props.pageTitle ? this.props.pageTitle(this.state) : window.document.title
     this.setProps({ loaded: false }).render()
     if (pushState !== false) window.history.pushState({ page_title }, page_title, url)
+    if (replaceState === true) window.history.replaceState({ page_title }, page_title, url)
     document.title = page_title
     this.props.beforePageChange && this.props.beforePageChange.call(this)
     const oldProps = Object.assign({}, this.props)

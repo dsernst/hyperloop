@@ -106,7 +106,7 @@ function serveHyperloopPage(config, webpackConfig, compiler, RootComponent, req,
 
   context.initialize(RootComponent).then((html) => {
     if (context.location.method === 'POST') {
-      return res.redirect(context.location.path)
+      return res.redirect(303, context.location.path)
     }
 
     if (!context.redirected) {
