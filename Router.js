@@ -76,11 +76,11 @@ module.exports = class Router extends Component {
   navigateTo(url, pushState, replaceState) {
     const prev_path = this.location.path
     let page_title = this.props.pageTitle ? this.props.pageTitle(this.state) : window.document.title
+    this.props.beforePageChange && this.props.beforePageChange.call(this)
     this.setProps({ loaded: false }).render()
     if (pushState !== false) window.history.pushState({ page_title }, page_title, url)
     if (replaceState === true) window.history.replaceState({ page_title }, page_title, url)
     document.title = page_title
-    this.props.beforePageChange && this.props.beforePageChange.call(this)
     const oldProps = Object.assign({}, this.props)
     Promise.resolve(this.load()).then(() => {
       if (prev_path !== this.location.path) window.scrollTo(0, 0)
