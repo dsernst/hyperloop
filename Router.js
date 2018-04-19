@@ -89,7 +89,7 @@ module.exports = class Router extends Component {
       document.title = page_title
       window.history.replaceState({ page_title }, page_title, url)
       const component = this.props.loaded.for(this, this.props, `${this.location.path}-loadable-loaded`, false)
-      if (component.props.url && component.onpagechange) component.onpagechange(oldProps)
+      if (component.onpagechange) component.onpagechange(oldProps)
       this.context.render()
     })
   }
