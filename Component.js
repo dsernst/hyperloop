@@ -11,6 +11,7 @@ module.exports = class Component {
 
     Object.defineProperties(this, {
       context: { value: context },
+      initializing: { value: false, writable: true },
       node: { value: null, writable: true },
       props: { value: Object.assign({}, props) },
       wire: { value: null, writable: true },
@@ -21,10 +22,12 @@ module.exports = class Component {
     }
 
     if (!context.initializing && this.oninit) {
+      this.initializing = true
       if (this.isBrowser) {
         console.group(`${this.constructor.name}.oninit`)
       }
       Promise.resolve(this.oninit()).then((newState) => {
+        this.initializing = false
         if (newState) this.setState(newState)
         if (this.isBrowser) {
           console.debug('newState:', newState)
@@ -141,7 +144,7 @@ module.exports = class Component {
     for (let key in newState) {
       state[key] = newState[key]
     }
-    if (!this.context.initializing && render !== false) this.context.render()
+    if (!this.initializing && !this.context.initializing && render !== false) this.context.render()
     return this
   }
 
