@@ -33,7 +33,7 @@ module.exports = class Router extends Component {
   onclick(event) {
     const node = event.target
     const parent = node.parentNode
-    const anchor = node.tagName === 'A' ? node : (parent.tagName === 'A' && parent)
+    const anchor = node.tagName === 'A' ? node : (parent && parent.tagName === 'A' && parent)
     const href = anchor && anchor.getAttribute('href')
 
     if (!event.metaKey && href && href[0] === '/' && href !== this.location.url) {
