@@ -349,7 +349,7 @@ function makeWebpackConfig(entry, config = {}) {
               pure_funcs: ['console.debug', 'console.group', 'console.groupEnd'],
             },
             ecma: 6,
-            mangle: false,
+            mangle: true,
             keep_classnames: true,
             keep_fnames: true,
           },
