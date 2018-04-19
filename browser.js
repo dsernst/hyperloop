@@ -6,7 +6,6 @@ const noop = () => {}
 
 module.exports = class HyperloopContext {
   constructor(state = {}) {
-    this.adopting = false
     this.initializing = false
     this.redirect = this.redirect.bind(this)
     this.rendering = false
@@ -22,31 +21,6 @@ module.exports = class HyperloopContext {
         return cookies.erase(key)
       },
     }
-  }
-
-  adopt(...args) {
-    const template = args[0]
-    const interpolationNodes = find(this.node)
-    const interps = []
-
-    for (let i = 1, l = args.length; i < l; i++) {
-      let slice = template[i - 1].slice(-2)
-      if (slice !== '="' && slice[1] !== '=') {
-        interps.push({ index: i, interp: args[i] })
-      }
-    }
-
-    for (let i = 0, l = interps.length; i < l; i++) {
-      const interpolation = interps[i].interp
-      const isThunk = typeof interpolation === 'function' && interpolation.adoptableThunk
-      if (isThunk) {
-        args[interps[i].index] = interpolation({ ownerDocument: document, childNodes: interpolationNodes[i] || [] })
-      }
-    }
-
-    this.onconnected && this.onconnected({ type: 'connected', preventDefault: noop, stopPropagation: noop })
-
-    return this.wire.apply(this, args)
   }
 
   get location() {
@@ -72,12 +46,28 @@ module.exports = class HyperloopContext {
       this.initializing = false
 
       if (adopt) {
-        // create root component node fragment to adopt
-        this.root.node = { ownerDocument: document, childNodes: Array.prototype.slice.call(container.childNodes, 1, -1) }
+        window.adoptable = {}
+        var tw = document.createTreeWalker(document, NodeFilter.SHOW_COMMENT, null, null),
+            comment;
+        while (comment = tw.nextNode()) {
+          let node = comment
+          if (/^\u0001.+$/.test(comment.textContent)) {
+            let textContent = comment.textContent
+            window.adoptable[comment.textContent] = window.adoptable[comment.textContent] || []
+            while ((node = node.nextSibling)) {
+              if (node.nodeType === 8 && node.textContent === textContent) {
+                break;
+              } else {
+                window.adoptable[comment.textContent].push(node)
+              }
+            }
+          }
+        }
 
-        this.adopting = true
+        // create root component node fragment to adopt
+        this.root.node = { ownerDocument: document, childNodes: Array.prototype.slice.call(container.childNodes) }
+
         this.render()
-        this.adopting = false
       } else {
         hyperhtml.bind(container)`${this.render()}`
       }
@@ -114,41 +104,4 @@ module.exports = class HyperloopContext {
   }
 
   setStatus(code) {}
-}
-
-const COMMENT_NODE = 8
-const ELEMENT_NODE = 1
-
-// finds dom nodes for each interpolation, using comment markers inserted by the server
-function find(node, interpolations, indexState = {}) {
-  const childNodes = node.childNodes
-
-  interpolations = interpolations || []
-  indexState.index = indexState.index || 0
-
-  for (let i = 0, l = childNodes.length; i < l; i++) {
-    interpolations[indexState.index] = interpolations[indexState.index] || []
-
-    if (node = childNodes[i]) {
-      if (
-        node.nodeType === COMMENT_NODE &&
-        /^\u0001:[0-9a-zA-Z]+$/.test(node.textContent)
-      ) {
-        let textContent = node.textContent
-        while ((node = node.nextSibling)) {
-          i++;
-          if (node.nodeType === COMMENT_NODE && node.textContent === textContent) {
-            indexState.index++;
-            break;
-          } else {
-            interpolations[indexState.index].push(node)
-          }
-        }
-      } else if (node.nodeType === ELEMENT_NODE) {
-        find(node, interpolations, indexState)
-      }
-    }
-  }
-
-  return interpolations
 }

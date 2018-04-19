@@ -62,19 +62,14 @@ module.exports = class Component {
         return Promise.all(component.render())
       })
     }
-    // when adopting, return a thunk that receives the DOM node to adopt
-    else if (context.adopting) {
-      const adoptableThunk = (node) => {
-        component.node = node
-        return component.render()
-      }
-      adoptableThunk.adoptableThunk = true
-      return adoptableThunk
-    }
 
     component.setProps(props)
 
     if (render === false) return component
+    const key = `\u0001${parent.constructor.name}${this.name}${id || ''}`
+    if (typeof window !== 'object') {
+      return [`<!--${key}-->${component.render()}<!--${key}-->`]
+    }
     return component.render()
   }
 
@@ -109,7 +104,6 @@ module.exports = class Component {
   get html() {
     if (this.context.initializing) return promisedInterpolations
     if (!this.wire) this.wire = hyperhtml.wire(null, 'html', this.node)
-    if (this.context.adopting) return this.context.adopt
     return this.wire
   }
 
@@ -162,7 +156,6 @@ module.exports = class Component {
   get svg() {
     if (this.context.initializing) return promisedInterpolations
     if (!this.wire) this.wire = hyperhtml.wire(null, 'svg', this.node)
-    if (this.context.adopting) return this.context.adopt
     return this.wire
   }
 

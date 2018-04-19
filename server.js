@@ -54,10 +54,6 @@ module.exports = function hyperloopServer(entry, config = {}) {
 
   compiler.outputFileSystem = fs
 
-  if (config.javascript !== false) {
-    hyperhtml.adoptable = true
-  }
-
   if (env === 'production' || config.liveReload === false) {
     compileHyperloopBundle(entry, compiler)
   } else {
@@ -121,7 +117,7 @@ function serveHyperloopPage(config, webpackConfig, compiler, RootComponent, req,
               : ''}
           </head>
           <body>
-            <div id="hyperloop_application"></div>
+            <div id="hyperloop_application">${html}</div>
           </body>
         </html>
       `)
