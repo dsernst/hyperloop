@@ -1,4 +1,6 @@
-const HyperloopContext = require('hyperloop/browser')
+require('@babel/polyfill')
+
+const HyperloopContext = require('./browser')
 const RootComponent = require(__HYPERLOOP_ENTRY_PATH__)
 const config = __HYPERLOOP_CONFIG__ || {}
 

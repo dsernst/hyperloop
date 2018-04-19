@@ -319,7 +319,7 @@ function makeWebpackConfig(entry, config = {}) {
       rules: [
         {
           test: /\.js$/,
-          exclude: /node_modules\/(?!(hyperloop|hyperhtml)).*/,
+          exclude: /node_modules\/(?!(hyperloop|hyperhtml))/,
           use: {
             loader: 'babel-loader',
             options: {
@@ -327,7 +327,7 @@ function makeWebpackConfig(entry, config = {}) {
                 targets: {
                   browsers: ["last 3 versions", "IE >= 11", "safari >= 7"]
                 },
-                useBuiltins: true
+                useBuiltIns: 'entry',
               }]],
               plugins: [
                 './babel-plugin-dynamic-import-browser',
@@ -366,7 +366,6 @@ function makeWebpackConfig(entry, config = {}) {
     resolve: {
       alias: {
         './server.js': './server.browser-warning.js',
-        'hyperloop/browser': './browser.js',
         'hyperhtml': 'hyperhtml/cjs',
         'viperhtml': 'hyperhtml/cjs/index'
       }
