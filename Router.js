@@ -43,15 +43,18 @@ module.exports = class Router extends Component {
   }
   onsubmit(event) {
     const form = event.target && event.target.tagName === 'FORM' && event.target
-    const isGET = form.getAttribute('method') === 'GET'
-    const action = form.getAttribute('action') || this.location.path
 
-    if (form && isGET) {
-      event.preventDefault()
-      const formData = this.context.form(form)
-      const formUrl = urlencoded(formData)
-      if (formUrl) {
-        this.navigateTo(`${action}?${formUrl}`)
+    if (form) {
+      const isGET = form.getAttribute('method') === 'GET'
+      const action = form.getAttribute('action') || this.location.path
+
+      if (isGET) {
+        event.preventDefault()
+        const formData = this.context.form(form)
+        const formUrl = urlencoded(formData)
+        if (formUrl) {
+          this.navigateTo(`${action}?${formUrl}`)
+        }
       }
     }
   }
