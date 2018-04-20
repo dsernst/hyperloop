@@ -42,7 +42,7 @@ module.exports = class Router extends Component {
     }
   }
   onsubmit(event) {
-    const form = event.target.tagName === 'FORM' && event.target
+    const form = event.target && event.target.tagName === 'FORM' && event.target
     const isGET = form.getAttribute('method') === 'GET'
     const action = form.getAttribute('action') || this.location.path
 
