@@ -109,6 +109,12 @@ module.exports = class Router extends Component {
       this.setProps({ loaded: loader.default || loader })
     }
   }
+  getParams(matches, route) {
+    return matches.slice(1).reduce((b, a, i) => {
+      b[route.keys[i].name] = a
+      return b
+    }, {})
+  }
   match() {
     const { routes } = this.props
     const { url, path } = this.location
@@ -132,10 +138,7 @@ module.exports = class Router extends Component {
         this.setProps({
           url,
           path,
-          params: matches.slice(1).reduce((b, a, i) => {
-            b[route.keys[i].name] = a
-            return b
-          }, {})
+          params: this.getParams(matches, route),
         })
         return route.loader
       }
