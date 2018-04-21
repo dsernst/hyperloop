@@ -132,7 +132,7 @@ class HyperloopContext {
     this.initializing = false
     this.location = {
       method: req.method,
-      path: req.path,
+      path: url.parse(req.originalUrl).pathname,
       redirect: this.redirect.bind(this),
       query: req.query,
       setStatus: this.setStatus.bind(this),
