@@ -79,23 +79,24 @@ module.exports = class Component {
   // dispatches events to any instance function of the same event name, such as "onsubmit" or "onclick"
   // provides easy event binding in templates by using "this": <button onclick=${this}>Click me</button>
   handleEvent(event) {
-    if (this.isBrowser) {
-      console.group(`${this.constructor.name}.on${event.type}`)
-      console.debug('event:', event)
-    }
-
     const handler = this[`on${event.type}`]
-    let formData = null
 
-    if (event.type === 'submit') {
-      formData = this.context.form(event.currentTarget)
-      if (this.isBrowser) console.debug('formData:', formData)
-    }
-
-    if (this.isBrowser) console.groupEnd()
-
-    // set new state if returned from event handler
     if (handler) {
+      if (this.isBrowser) {
+        console.group(`${this.constructor.name}.on${event.type}`)
+        console.debug('event:', event)
+      }
+
+      let formData = null
+
+      if (event.type === 'submit') {
+        formData = this.context.form(event.currentTarget)
+        if (this.isBrowser) console.debug('formData:', formData)
+      }
+
+      if (this.isBrowser) console.groupEnd()
+
+      // set new state if returned from event handler
       event.stopPropagation()
       return Promise.resolve(handler.call(this, event, formData)).then((newState) => {
         if (newState) this.setState(newState)
