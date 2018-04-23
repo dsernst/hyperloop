@@ -28,7 +28,7 @@ module.exports = class Component {
       }
       Promise.resolve(this.oninit()).then((newState) => {
         this.initializing = false
-        if (newState) this.setState(newState)
+        this.setState(newState)
         if (this.isBrowser) {
           console.debug('newState:', newState)
           console.groupEnd()
@@ -142,8 +142,10 @@ module.exports = class Component {
     if (typeof newState === 'function') {
       newState = newState(state)
     }
-    for (let key in newState) {
-      state[key] = newState[key]
+    if (newState) {
+      for (let key in newState) {
+        state[key] = newState[key]
+      }
     }
     if (!this.initializing && !this.context.initializing && render !== false) this.context.render()
     return this
