@@ -330,7 +330,7 @@ function makeWebpackConfig(entry, config = {}) {
                 useBuiltIns: 'entry',
               }]],
               plugins: [
-                './babel-plugin-dynamic-import-browser',
+                'babel-plugin-syntax-dynamic-import',
                 'babel-plugin-transform-object-rest-spread',
               ].map(require.resolve)
             }
