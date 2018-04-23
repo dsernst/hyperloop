@@ -9,7 +9,7 @@ const initialState = window.__hyperloop_state
 const adopt = !window.__hyperloop_adopted$ && config.javascript !== false
 const context = new HyperloopContext(initialState)
 
-context.initialize(RootComponent, container, adopt)
+context.initialize(RootComponent, container, false)
 
 if (module.hot) {
   window.__hyperloop_adopted$ = true
