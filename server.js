@@ -137,7 +137,7 @@ class HyperloopContext {
       query: req.query,
       setStatus: this.setStatus.bind(this),
       ip: req.ip,
-      url: this.originalUrl,
+      url: req.originalUrl,
       userAgent: req.get('User-Agent') || 'Unknown',
     }
     this.body = req.body
