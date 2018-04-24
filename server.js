@@ -287,7 +287,7 @@ function compileHyperloopBundle(entry, compiler) {
 }
 
 function makeWebpackConfig(entry, config = {}) {
-  if (!(entry[0] === '/' || entry.slice(0, 1) === 'C:')) {
+  if (!path.isAbsolute(entry)) {
     throw new Error('path to root component must be absolute, not relative')
   }
 
